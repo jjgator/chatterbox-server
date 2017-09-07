@@ -12,7 +12,9 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 var exports = module.exports = {};
-let results = [];
+let results = [
+  {username: "Test", message: "Test"}
+];
 var requestHandler = function(request, response) {
 
   var defaultCorsHeaders = {
@@ -28,12 +30,17 @@ var requestHandler = function(request, response) {
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
   //================================================================================
 
-  if (request.method === 'GET' && request.url === '/classes/messages') {
+
+  if (request.method === 'OPTIONS') {
+    response.writeHead(203, headers);
+    response.end(JSON.stringify(headers));
+  } else if (request.method === 'GET' && request.url === '/classes/messages') {
     response.writeHead(200, headers);
     response.end(JSON.stringify({results}));
   } else if (request.method === 'POST' && request.url === '/classes/messages') {
     request.on('data', (chunk) => {
       var message = JSON.parse(chunk.toString());
+      message.objectId = new Date();
       results.unshift(message);
     });
     request.on('end', () => {
